@@ -1,8 +1,27 @@
 # Ghost Hotel Detector — London
 
-An end-to-end intelligence system that identifies London properties illegally operating as full-time short-term rentals on Airbnb, scores them by enforcement priority, predicts risk for brand-new listings with a machine-learning model, and drafts AI enforcement notices — all served through an **agentic officer console**.
+A fully local **systems-engineering pipeline** that ingests raw open data at scale, fuses it on-device, and turns it into prosecution-ready enforcement intelligence — running end-to-end on a single **NVIDIA GB10 (DGX Spark)** with **zero cloud calls**.
 
-Runs on an **NVIDIA GB10 (DGX Spark)**.
+We didn't wrap an API. We **collected twelve heterogeneous public datasets** (Inside Airbnb, Companies House, Land Registry, Ordnance Survey, the London Datastore, MOPAC, CHAIN), **decompressed and normalised 1.8 GB of raw source files into 49.9 million rows of columnar Parquet**, then ran a multi-stage local pipeline over them — **GPU-accelerated aggregation (cuDF), fuzzy entity resolution, a gradient-boosted ML classifier, and a locally-served vision-language model (Nemotron Nano VL on vLLM)** — to identify London properties illegally operating as full-time short-term rentals, score them by enforcement priority, predict risk for brand-new listings, and auto-draft legal enforcement notices. Everything is delivered through an **agentic officer console** a council officer could use to make a decision tomorrow.
+
+### Why this runs on a DGX Spark
+- **128 GB unified memory** lets us hold the full **35.4 M-row booking calendar**, the **5.7 M-row UK company register**, and the **12 B-parameter VL model's context** resident **simultaneously** — no host↔device copies, no swapping out to disk between the analytics stage and the inference stage.
+- **Local inference = privacy + cost + latency.** Property-level investigation data and council enforcement drafts **never leave the box**. Merely calling a hosted GPT endpoint would leak sensitive case data and add network round-trips; here every token is generated on-device.
+- **Heterogeneous compute on one node:** RAPIDS/cuDF for the data-parallel sweep, scikit-learn for the model, and a vLLM-served Nemotron VL for reasoning — all sharing the same memory pool on the GB10.
+
+### Judged on systems engineering — what we shipped end-to-end
+
+| Stage | What it does | Tech |
+|---|---|---|
+| **Ingest** | 12 datasets · 1.8 GB raw → 49.9 M rows Parquet | pandas · pyarrow |
+| **Accelerate** | Booking-density sweep over 35.4 M rows, **3.8× faster on GPU** | **cuDF · CUDA 13** |
+| **Resolve** | Collapse host aliases → canonical operators; cross-ref Companies House | rapidfuzz · SIC filtering |
+| **Score** | 8-signal weighted confidence model (F1–F8) per listing | custom pipeline |
+| **Predict** | Gradient-boosted classifier triages brand-new live listings | scikit-learn |
+| **Reason** | Commercial-language read, agent routing, enforcement drafting | **Nemotron Nano VL · vLLM** |
+| **Act** | Agentic officer console: ask in plain English, get the case | Streamlit · Folium |
+
+Runs on an **NVIDIA GB10 (DGX Spark)** · CUDA 13.0 · cuDF 26.4.0 · vLLM.
 
 ---
 
