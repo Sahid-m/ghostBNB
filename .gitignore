@@ -1,0 +1,52 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.Python
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment / secrets
+.env
+.env.*
+*.key
+
+# ---- Logs ----
+*.log
+cufile.log
+
+# ---- Notebooks ----
+.ipynb_checkpoints/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- Data (too large for git; regenerate via pipeline) ----
+# Raw inputs and derived/clean/scored datasets are big (GBs) and exceed
+# GitHub's 100MB-per-file limit. Keep them out of version control.
+data/raw/
+data/clean/
+data/scored/
+
+# Large binary data formats anywhere (safety net)
+*.parquet
+*.csv.gz
+*.zip
+*.ods
+*.xlsx
+*.shp
+*.dbf
+*.shx
+*.prj
+
+# Keep small curated artifacts:
+!data/models/
+!data/enforcement/
