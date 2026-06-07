@@ -1,0 +1,16 @@
+[theme]
+# Pin a light theme so native widgets (dataframes, markdown, chat) always render
+# dark text on light backgrounds, matching the custom cards in dashboard/ui.py.
+# Without this, a user on a dark-mode browser gets white text on white cards.
+base = "light"
+primaryColor = "#4f46e5"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f6f7f9"
+textColor = "#1f2430"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false
